@@ -1,14 +1,49 @@
+# AI Imports
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
+
+# Standard Library
 from glob import glob
+
+
+class DataSet:
+    """
+    
+    """
+
+class Vocab:
+    def __init__(self, data_dir):
+        # do stuff to extract the vocabulary
+        
+
+    def idx2word(self, idx):
+        """
+        What arguments (datatypes)
+        What does it do (logic/effects)
+        What outputs (datatypes)
+        """
+        return ""
+
+    def word2idx(self, word):
+        """
+        What arguments (datatypes)
+        What does it do (logic/effects)
+        What outputs (datatypes)
+        """
+        return 0
+
+
 class Model:
     ##Import Data
     columns = ['review', 'class']
     data = [(open(filename, 'r').readlines()[0], 'pos') for filename in glob('aclImdb/train/pos/*.txt')]
+    
     for filename in glob('aclImdb/train/neg/*.txt'):
         data.append((open(filename, 'r').readlines()[0], 'neg'))
+    
     train_data = pd.DataFrame(data, columns=columns)
+    
     ##Find probabilite
     ##Find probablilies of each classifications
     totalPosReviews = 0
@@ -20,6 +55,7 @@ class Model:
             totalNegReviews+=1
     pPos = totalPosReviews/len(train_data)
     pNeg = totalNegReviews/len(train_data)
+    
     def probGivenClass(self,sentence,classification):
        """Find probabilies of a review given the classification"""
        train_data = self.train_data
@@ -48,6 +84,7 @@ class Model:
        prob_word = dict(zip(sentence, prob))
        num = np.product(prob)
        return prob_word, num
+   
     def finalProb(self,review):
         pPos = self.pPos
         pNeg = self.pNeg
