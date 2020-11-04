@@ -10,6 +10,7 @@ class DataSet():
 
     def __init__(self, trainingdir):
         self.trainingDir = trainingdir
+        self.data_raw = self.load_data()
     # Helper/Util Function
 
     def data_splitter(self):
@@ -41,20 +42,35 @@ class DataSet():
 
     def data_loader(self,dirFiles):
         """
-        args: path of the files
+        args: path of the files, string
         Use the path of the files to get all the data in them, and store the data in a list
         return: (type: list, expl: all data in the path in a list)
         """
         data = []
-        dataCount = 0
         for filename in glob(dirFiles):
             with open(filename, 'r') as f:
                 data.append(f.readlines()[0])
         return data
     def data_labeler(self, data, label):
+        """
+        args: data(type: list, expl: review data), label(type: string, expl: the label wanted on data)
+        Take data and label, and make dictionary where the key is one data value, and the value is the label
+        return: (type: dictionary, expl: dictionary containing data and label)
+
+        ISSUES: Loses some data
+        """
         labelList = [label for review in data]
-        return dict(zip(data, labelList))
+        labeled = dict()
+        counter = 0
+        for review in data:
+            labeled[review] = label
+        return labeled
     def merge_dict(self,dict1, dict2):
+        """
+        args: dict1(type: dictionary, expl: one of the two dictionaries), dict2(type: dictionary, expl: one of two dictionaries to be merged)
+        Merge two dictionaries
+        return: (type: dictionary, expl: merged dictionary)
+        """
         dict3 = dict1.copy()
         for key, value in dict2.items():
             dict3[key] = value
@@ -62,6 +78,13 @@ class DataSet():
     # API Functions
 
     def load_data(self):
+        """
+        args: none
+        Gets directories of data preloaded with *.txt. Store data in list using data_loader function, and label data. Finally merge positive and negative data, and store into DataFrame
+        return: (type: DataFrame, expl: DataFrame containing review and classification)
+
+        ISSUE: Data loss due to data label function
+        """
         posDir, negDir = self.preload()
         posData = self.data_loader(posDir)
         negData = self.data_loader(negDir)
@@ -72,13 +95,17 @@ class DataSet():
         return pd.DataFrame(list(data.items()), columns = columns)
     def preProcessData(self):
         """
+        args: none
+        Helper functions: tokenizer(tokenizes data) 
+                          remove_stop_words(remove stop words and puncuations from data)
         return type is bag of words
         """
         return bag
 
 
 data = DataSet('aclImdb/train/')
-print(data.load_data())
+print(data.data)
+
 
 
 class Model:
