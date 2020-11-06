@@ -4,15 +4,17 @@ import pandas as pd
 from glob import glob
 import os
 import spacy
-
+nlp = spacy.load('en_core_web_sm')
+test = nlp("This is a test")
 everyFile = '*.txt'
+stop_words = nlp.Defaults.stop_words
 class DataSet():
 
     def __init__(self, trainingdir):
         self.trainingDir = trainingdir
-        self.data_raw = self.load_data()
+        self.data_raw_p, self.data_raw_n, self.data_raw = self.load_data()
+        self.data_prep_p, self.data_prep_n = self.preProcessData(self.data_raw_p, 'pos'), self.preProcessData(self.data_raw_n, 'neg')
     # Helper/Util Function
-
     def data_splitter(self):
         """
         No args
@@ -56,15 +58,14 @@ class DataSet():
         args: data(type: list, expl: review data), label(type: string, expl: the label wanted on data)
         Take data and label, and make dictionary where the key is one data value, and the value is the label
         return: (type: dictionary, expl: dictionary containing data and label)
-
-        ISSUES: Loses some data
         """
-        labelList = [label for review in data]
-        labeled = dict()
-        counter = 0
-        for review in data:
-            labeled[review] = label
-        return labeled
+        #print("len(data) = {}".format(len(data)))
+        #set_data = set(data)
+        #print("len(set_data) = {}".format(len(set_data)))
+        res = {review: label for review in data}
+        #print("len(res) = {}".format(len(res)))
+        #Debugging
+        return res
     def merge_dict(self,dict1, dict2):
         """
         args: dict1(type: dictionary, expl: one of the two dictionaries), dict2(type: dictionary, expl: one of two dictionaries to be merged)
@@ -75,15 +76,46 @@ class DataSet():
         for key, value in dict2.items():
             dict3[key] = value
         return dict3
-    # API Functions
-
+    def flatten(self, list):
+        """
+        args: list(type: list, expl: 2D list to be flattened)
+        Flatten a 2D list
+        return: (type: list, expl: flattened list)
+        """
+        flattened = []
+        for i in list:
+            for x in list:
+                flattened.append(x)
+        return flattened
+    def wordCounter(self, words):
+        """
+        args: words(type: list, expl: list of all words)
+        Counts the words in list, and makes dictionary to store words and their respective counts. Gets rid of duplicate words by converting list to dictionary
+        return: (type: dictionary, expl: dictionary of words and respective counts)
+        """
+        word_count = dict()
+        for word in words:
+            count = 0
+            word_count[word] = 0
+            for word_check in list(words.key()):
+               if word==word_check:
+                   count+=1
+                   word_count[word] = count
+        return word_count
+    def get_reviews(self, data):
+        """
+        args: data(type: dictionary, expl: dictionary to extract keys from)
+        Get keys from dictionary and in this case, reviews from postive or negative review dictionary
+        return: (type: list, expl: list containing keys)
+        """
+        res = list(data.keys())
+        return res
+    #API Functions
     def load_data(self):
         """
         args: none
         Gets directories of data preloaded with *.txt. Store data in list using data_loader function, and label data. Finally merge positive and negative data, and store into DataFrame
-        return: (type: DataFrame, expl: DataFrame containing review and classification)
-
-        ISSUE: Data loss due to data label function
+        return: negData(type: dictionary, expl: dictionary containing labeled negative reviews), posData(type: dictionary, expl: dictionary containing labeled positive reviews), data_mixed(type: DataFrame, expl: DataFrame containing review and classification)
         """
         posDir, negDir = self.preload()
         posData = self.data_loader(posDir)
@@ -92,20 +124,35 @@ class DataSet():
         negData = self.data_labeler(negData, 'neg')
         data = self.merge_dict(posData, negData)
         columns = ['review', 'class']
-        return pd.DataFrame(list(data.items()), columns = columns)
-    def preProcessData(self):
+        data_mixed = pd.DataFrame(list(data.items()), columns = columns)
+        return negData, posData, data_mixed
+    def preProcessReview(self, review):
         """
-        args: none
-        Helper functions: tokenizer(tokenizes data) 
-                          remove_stop_words(remove stop words and puncuations from data)
-        return type is bag of words
+        args: review(type: String, expl: String containing the review)
+        Tokenize all words and remove non-alphabetic characters and stop words
+        return: (type: list, expl: list of words, preprocessed)
         """
-        return bag
+        review_nlp = nlp(review)
+        tokens = [token for token in review_nlp if token.is_alpha]
+        tokens = [token for token in tokens if token not in stop_words]
+        return tokens
+    def preProcessData(self, data):
+        """
+        args: data(type: dictionary, expl: the dictionary that contains labeled raw data of the reviews
+        Get all the reviews from dictionary, and tokenize it. Remove all stop words, and then get word count of each word
+        return: (type: dictionary, expl: dictionary containing words and their respective word counts)
+        """
+        reviewList = self.get_reviews(data)
+        words = list(map(self.preProcessReview, reviewList))
+        words = self.flatten(words)
+        res = self.wordCounter(words)
+        return res
+    
 
 
 data = DataSet('aclImdb/train/')
-print(data.data)
-
+print(data.data_raw)
+print(len(data.data_prep_p))
 
 
 class Model:
@@ -174,3 +221,8 @@ class Model:
         else:
             result = "negative"
         return probPosGivenReview, probNegGivenReview, result
+
+
+
+
+    
