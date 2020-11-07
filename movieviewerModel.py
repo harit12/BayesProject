@@ -13,7 +13,7 @@ class DataSet():
     def __init__(self, trainingdir):
         self.trainingDir = trainingdir
         self.data_raw_p, self.data_raw_n, self.data_raw = self.load_data()
-        self.data_prep_p, self.data_prep_n = self.preProcessData(self.data_raw_p, 'pos'), self.preProcessData(self.data_raw_n, 'neg')
+        self.data_prep_p, self.data_prep_n = self.preProcessData(self.data_raw_p), self.preProcessData(self.data_raw_n)
     # Helper/Util Function
     def data_splitter(self):
         """
@@ -76,15 +76,15 @@ class DataSet():
         for key, value in dict2.items():
             dict3[key] = value
         return dict3
-    def flatten(self, list):
+    def flatten(self, input_list):
         """
         args: list(type: list, expl: 2D list to be flattened)
         Flatten a 2D list
         return: (type: list, expl: flattened list)
         """
         flattened = []
-        for i in list:
-            for x in list:
+        for i in input_list:
+            for x in i:
                 flattened.append(x)
         return flattened
     def wordCounter(self, words):
@@ -97,7 +97,7 @@ class DataSet():
         for word in words:
             count = 0
             word_count[word] = 0
-            for word_check in list(words.key()):
+            for word_check in words:
                if word==word_check:
                    count+=1
                    word_count[word] = count
