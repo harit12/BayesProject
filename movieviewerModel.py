@@ -4,10 +4,13 @@ import pandas as pd
 from glob import glob
 import os
 import spacy
+import datetime
+from collections import Counter
 nlp = spacy.load('en_core_web_sm')
 test = nlp("This is a test")
 everyFile = '*.txt'
 stop_words = nlp.Defaults.stop_words
+print(datetime.datetime.now(), 'initial time')
 class DataSet():
 
     def __init__(self, trainingdir):
@@ -51,7 +54,7 @@ class DataSet():
         data = []
         for filename in glob(dirFiles):
             with open(filename, 'r') as f:
-                data.append(f.readlines()[0])
+                data.append(f.readlines())
         return data
     def data_labeler(self, data, label):
         """
@@ -93,14 +96,7 @@ class DataSet():
         Counts the words in list, and makes dictionary to store words and their respective counts. Gets rid of duplicate words by converting list to dictionary
         return: (type: dictionary, expl: dictionary of words and respective counts)
         """
-        word_count = dict()
-        for word in words:
-            count = 0
-            word_count[word] = 0
-            for word_check in words:
-               if word==word_check:
-                   count+=1
-                   word_count[word] = count
+        word_count = dict(Counter(words))
         return word_count
     def get_reviews(self, data):
         """
@@ -120,6 +116,7 @@ class DataSet():
         posDir, negDir = self.preload()
         posData = self.data_loader(posDir)
         negData = self.data_loader(negDir)
+        print(datetime.datetime.now(), 'time to load reviews from disk')
         posData = self.data_labeler(posData, 'pos')
         negData = self.data_labeler(negData, 'neg')
         data = self.merge_dict(posData, negData)
@@ -145,16 +142,37 @@ class DataSet():
         reviewList = self.get_reviews(data)
         words = list(map(self.preProcessReview, reviewList))
         words = self.flatten(words)
+        print(datetime.datetime.now(), 'time for loading in word list')
         res = self.wordCounter(words)
+        print(datetime.datetime.now(), 'time at end')
         return res
+#data = DataSet('aclImdb/train/')
+class Vocab:
+    def __init__(self,dataDir):
+        self.vocab = self.extractVocab(dataDir)
+        
+    def extractVocab(self, dataDir):
+        """
+        args: dataDir(type: String, expl: the directory where vocab file is stored)
+        Extract vocab from the vocab file
+        return: (type: list, expl: list containing all vocab words)
+        """
+        vocab = []
+        with open(os.path.join(dataDir, 'imdb.vocab'), 'r') as f:
+            vocab = [lines.rstrip('\n') for lines in f.readlines()]
+        return vocab
     
+    def idx2word(self,index):
+        vocab = self.vocab
+        word  = vocab[index]
+        return word
+    def word2idx(self, word):
+        vocab = self.vocab
+        index = vocab.index(word)
+        return index
 
-
-data = DataSet('aclImdb/train/')
-print(data.data_raw)
-print(len(data.data_prep_p))
-
-
+vocabulary = Vocab('aclImdb')
+print(vocabulary.idx2word(5))
 class Model:
     # Import Data
     columns = ['review', 'class']
@@ -178,8 +196,7 @@ class Model:
     def probGivenClass(self, sentence, classification):
         """Find probabilies of a review given the classification"""
         train_data = self.train_data
-        reviewInClass = [row['review'].lower(
-        ) for index, row in train_data.iterrows() if row['class'] == classification]
+        reviewInClass = [row['review'].lower() for index, row in train_data.iterrows() if row['class'] == classification]
         # Get number of times word appears in sentence
         vectorizer = CountVectorizer()
         wordcounter = vectorizer.fit_transform(reviewInClass)
