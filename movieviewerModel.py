@@ -109,7 +109,6 @@ class DataSet():
         """
         res = list(data.keys())
         return res
-    #API Functions
     def load_data(self):
         """
         args: none
