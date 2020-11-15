@@ -282,8 +282,8 @@ class Model:
         probReviewGivenNeg = self.probGivenClass(review, 'neg')
         #Debugging:
         #print(probReviewGivenPos)
-        probPosGivenReview = probReviewGivenPos*pPos/(pNeg)
-        probNegGivenReview = probReviewGivenNeg*pNeg/(pPos)
+        probPosGivenReview = probReviewGivenPos*pPos/(probReviewGivenPos*pPos+probReviewGivenNeg*pNeg)
+        probNegGivenReview = probReviewGivenNeg*pNeg/(probReviewGivenNeg*pNeg+probReviewGivenPos*pPos)
         result = ""
         if probPosGivenReview > probNegGivenReview:
             result = "positive"
