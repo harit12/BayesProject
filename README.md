@@ -1,5 +1,5 @@
 # Naive Bayes
-### How to use
+## How to use
 ### Prerequisites  
 The model needs these libraries installed:
  * Spacy
