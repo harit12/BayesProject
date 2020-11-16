@@ -1,5 +1,14 @@
 # Naive Bayes
 ### How to use
+### Prerequisites  
+The model needs these libraries installed:
+ * Spacy
+ * Numpy
+ * Scipy
+ * Scikit-learn
+ * glob
+ * dill
+ * en_core_web_sm model of Spacy
 #### iPython
 You can use the script via iPython by importing the Model class from the movieviewerModel module. From here, a Model object can be created via constructer, which inputs the training directory, which in this case is aclImdb/train. This will take about 14 minutes, so maybe get some food while the model trains. View the code if there are any errors  
 Example:
