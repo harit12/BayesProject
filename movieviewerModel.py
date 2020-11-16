@@ -9,7 +9,8 @@ import spacy
 from collections import Counter
 #Debugging
 import datetime
-
+#Store Pretrained
+import pickle
 nlp = spacy.load('en_core_web_sm')
 
 #Debugging:
@@ -294,6 +295,6 @@ def main():
     pass
 if __name__ =='__main__':
     main()
-
+    
 
     
