@@ -24,3 +24,13 @@ Examples:
 ```
 #### Inside script
 You can also edit the script, and change the main function to what you would like. You can use the API functions to in the main function and run movieviewerModel.py directly too.
+#### Pretrained Model
+You can also used the pretrained model. This can be done by unzipping the pretrained_model.zip file. After unzipping the compressed folder, use iPython and load the pretrained model using the pretrained_loader.py script. To do this, start iPython, import the pretrain_loader function from the pretrained_loader module and store the return value of the function in variable. The variable is the pretrained model. Also, the function takes one input, which is the file location of the pretrained.obj file, which should be in the unzipped pretrained_model folder.
+Example:
+```
+[1] from pretrained_loader import pretrain_loader
+
+[2] model_pretrained = pretrain_loader(filename)
+
+[3]*Use the model as you would like from here. Instructions for use of the model is above*
+```
