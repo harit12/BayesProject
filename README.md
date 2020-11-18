@@ -19,7 +19,15 @@ Example:
 ```
 *This step will take 14 minutes about*  
 
-After the model trains, the user can use different API methods. The main API method is finalProb method of the Model class. It takes a String input and returns if the probabilities of it being negative and positive. Another API method is the get_bow method of the Corpus class, which returns the bag of words vector. This can be accessed by getting the corpus instance variable inside of the model object. There are two corpus variables: corpus_n is for the negative training data, corpus_p is for the positive training data. The last API methods are word2idx and idx2word, which methods of the Vocab class. This can be accessed by using the 2 vocab instance variable, where vocab_p is for positive training data, and vocab_n is for negative training data.  
+##### API Methods
+###### model.finalProb:
+  * Takes in String input, which is a movie review. It returns the positive, and negative probabilites, and the classification of the inputted review
+###### model.corpus.get_bow:
+  * Takes in no arguments, and returns bag of words matrix
+###### model.vocab.word2idx: 
+  * Takes in String input, which is the word, and then returns the index of the word in the vocabulary list
+###### model.vocab.idx2word: 
+  * Takes in int input, which is the input in vocab list, and reurns word at the index in the vocabulary list
 Examples:
 ```
 [3] model.finalProb("This movie is horrible")
