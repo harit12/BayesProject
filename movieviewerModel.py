@@ -39,6 +39,13 @@ class DataSet():
         self.data_raw_n, self.data_raw_p, self.data_raw = self.load_data()
         self.data_prep_p = self.preProcessData(self.data_raw_p)
         self.data_prep_n =  self.preProcessData(self.data_raw_n)
+        posList = ['pos' for sentence in self.data_prep_p]
+        negList = ['neg' for sentence in self.data_prep_n]
+        self.data_prep_n_labeled = zip(self.data_prep_n, negList)
+        self.data_prep_p_labeled = zip(self.data_prep_p, posList)
+        self.data_prep_labeled = list(self.data_prep_p_labeled) +list(self.data_prep_n_labeled)
+        self.data_prep = self.data_prep_p + self.data_prep_n
+         
     # Helper/Util Function
     def data_splitter(self):
         """
@@ -146,6 +153,7 @@ class DataSet():
         return: res(type: list, expl: 2D list containing tokens, and are all preprocessed)
         """
         reviewList = self.get_reviews(data)
+        print(len(reviewList))
         words = list(map(self.preProcessReview, reviewList))
         print(datetime.datetime.now(), 'time for loading in word list')
         return words
